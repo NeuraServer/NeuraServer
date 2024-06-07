@@ -1,4 +1,3 @@
-
 .global server_main
 server_main:
 mov $102, %eax
