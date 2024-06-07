@@ -1,4 +1,2 @@
 /target
 **/*.rs.bk
-# Ignore Docker related files
-docker-compose.override.yml
