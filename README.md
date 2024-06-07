@@ -34,5 +34,5 @@ The server listens on `127.0.0.1:8080`. Connect to it using a TCP client.
 
 ### License
 
-This project is licensed under the MIT License.
+This project is licensed under the [GNU General Public License 3.0](https://www.gnu.org/licenses/gpl-3.0.en.html) License.
 
