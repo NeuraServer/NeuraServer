@@ -35,6 +35,8 @@ NeuraServer is designed to handle high-performance network operations with the r
 
     ```sh
     cargo run
+    go build handler.go
+    g++ mod.cpp -o mod.exe
     ```
 
 ## Usage
