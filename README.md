@@ -24,7 +24,7 @@ To build and run this project, you will need the following software installed on
 
 1. **Clone the Repository**
     ```bash
-    git clone https://github.com/yourusername/NeuraServer.git
+    git clone https://github.com/NeuraServer/NeuraServer.git
     cd NeuraServer
     ```
 
