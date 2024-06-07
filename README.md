@@ -38,6 +38,8 @@ NeuraServer is designed to handle high-performance network operations with the r
 
 ## Usage
 
+![image](https://github.com/NeuraServer/NeuraServer/assets/140754373/29d6bce2-846f-45c4-9e06-08825fba4829)
+
 ### Running with Docker
 
 The Docker configuration files are located in the `.docker` directory.
