@@ -2,33 +2,28 @@
 # --- NeuraServer Copyright 2024 ---
 # ----------------------------------
 
-# Define variables
-PROJECT_NAME = neura_server
-TARGET_DIR = target
-RELEASE_DIR = $(TARGET_DIR)/release
-SRC_DIR = src
+RUST_SRC = src/server_ops/*.rs
+GO_SRC = src/server/*.go
+CPP_SRC = src/server/monitor.cpp
+ELIXIR_SRC = src/server_ops/*.ex
 
-# Default target
-all: build
+all: build_rust build_go build_cpp build_elixir
 
-# Build the project
-build:
-	cargo build --release
+build_rust:
+	cargo build --release --manifest-path $(RUST_SRC)
 
-# Run the project
-run: build
-	$(RELEASE_DIR)/$(PROJECT_NAME)
+build_go:
+	go build -o bin/server $(GO_SRC)
 
-# Clean the project
+build_cpp:
+	g++ $(CPP_SRC) -o bin/monitor -lboost_system
+
+build_elixir:
+	mix compile --source $(ELIXIR_SRC)
+
 clean:
 	cargo clean
-
-# Format the source code
-fmt:
-	cargo fmt
-
-# Check for common mistakes
-lint:
-	cargo clippy
-
-.PHONY: all build run clean fmt lint
+	go clean
+	rm -f bin/server
+	rm -f bin/monitor
+	mix clean
