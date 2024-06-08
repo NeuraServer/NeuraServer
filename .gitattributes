@@ -1,0 +1,14 @@
+# Mark all .ex files as Elixir
+*.ex linguist-language=Elixir
+
+# Mark all .kt files as Kotlin
+*.kt linguist-language=Kotlin
+
+# Mark all .rs files as Rust
+*.rs linguist-language=Rust
+
+# Mark all .go files as Go
+*.go linguist-language=Go
+
+# Mark all .cpp files as C++
+*.cpp linguist-language=C++
