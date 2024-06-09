@@ -38,8 +38,9 @@ NeuraServer is designed to handle high-performance network operations with the r
 
     ```sh
     cargo run
-    go build handler.go
-    g++ mod.cpp -o mod.exe
+    go build -o handler src/server/handler.go
+    go build -o logger src/server/logger.go
+    g++ src/serverasm/mod.cpp -o src/serverasm/mod.exe
     ```
 
 ## Usage
@@ -101,33 +102,3 @@ To ensure code quality and consistency, use the following commands during develo
     ```sh
     make lint
     ```
-
-## Source Code
-
-The source code for NeuraServer is organized as follows:
-
-- `main.rs`: The main entry point of the application. Initializes the server and starts the main event loop.
-- `server/mod.rs`: Contains the server implementation, including the setup and handling of connections.
-- `server/handler.go`: Defines the logic for handling client connections and requests in Go.
-- `asm/mod.cpp`: Contains the inline assembly code for low-level server operations in C++.
-- `.docker/Dockerfile`: Dockerfile for building the Docker image.
-- `.docker/docker-compose.yml`: Docker Compose file for running the server in a Docker container.
-
-### Main Components
-
-#### main.rs
-
-```rust
-use tokio::net::TcpListener;
-use crate::server::run_server;
-
-mod server;
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let listener = TcpListener::bind("127.0.0.1:8080").await?;
-    run_server(listener).await?;
-    Ok(())
-}
-```
-
