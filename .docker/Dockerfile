@@ -1,28 +1,25 @@
-# Use the official Rust image as the base image
-FROM rust:1.58 as builder
+# Use an official Rust runtime as a parent image
+FROM rust:latest
 
-# Create a new empty shell project
-RUN USER=root cargo new --bin neura_server
-WORKDIR /neura_server
+# Set the working directory in the container
+WORKDIR /usr/src/app
 
-# Copy the manifests
-COPY Cargo.toml Cargo.lock ./
+# Copy the current directory contents into the container at /usr/src/app
+COPY . .
 
-# Build the dependencies
-RUN cargo build --release
-RUN rm src/*.rs
+# Install any needed packages specified in requirements.txt
+RUN apt-get update && apt-get install -y gcc g++ libssl-dev
 
-# Copy the source code
-COPY src ./src
-
-# Build the project
+# Build the Rust project
 RUN cargo build --release
 
-# Use a minimal base image to reduce the size
-FROM debian:buster-slim
+# Build the Go handler and logger
+RUN go build -o handler src/server/handler.go
+RUN go build -o logger src/server/logger.go
 
-# Copy the build artifacts from the builder
-COPY --from=builder /neura_server/target/release/neura_server /usr/local/bin/neura_server
+# Build the C++ server simulation
+RUN g++ src/serverasm/mod.cpp -o src/serverasm/mod.exe
 
-# Run the binary
-CMD ["neura_server"]
+# Run the server
+CMD ["./target/release/neuraserver"]
+
