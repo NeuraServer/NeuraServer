@@ -7,7 +7,7 @@ NeuraServer is an advanced TCP server that demonstrates the integration of Go fo
 NeuraServer is designed to handle high-performance network operations with the robustness of Rust, the efficiency of Go, and the low-level capabilities of C++ for critical assembly operations.
 
 ## Checks
-![Static Badge](https://img.shields.io/badge/server-_127.0.0.1%3A5500-red?logo=github) ![Static Badge](https://img.shields.io/badge/build-_passing-green?logo=github)
+![Static Badge](https://img.shields.io/badge/server-_127.0.0.1%3A5500-red?logo=github) ![Static Badge](https://img.shields.io/badge/build-_passing-green?logo=github) ![Static Badge](https://img.shields.io/badge/docker-_present-blue?logo=github)
 
 ## Installation
 
@@ -25,7 +25,7 @@ NeuraServer is designed to handle high-performance network operations with the r
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/yourusername/NeuraServer.git
+    git clone https://github.com/NeuraServer/NeuraServer.git
     ```
 
 2. Navigate to the project directory:
