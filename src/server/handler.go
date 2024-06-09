@@ -5,47 +5,35 @@
 package main
 
 import (
-	"fmt"
-	"net"
-	"os"
-	"os/exec"
+    "net/http"
+    "github.com/gorilla/mux"
+    "log"
+    "encoding/json"
 )
 
-func handleConnections(listener net.Listener) {
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			fmt.Println("Error accepting connection:", err)
-			continue
-		}
-		go handleRequest(conn)
-	}
-}
-
-func handleRequest(conn net.Conn) {
-	buf := make([]byte, 1024)
-	for {
-		n, err := conn.Read(buf)
-		if err != nil {
-			if err != os.EOF {
-				fmt.Println("Error reading from connection:", err)
-			}
-			break
-		}
-		if _, err := conn.Write(buf[:n]); err != nil {
-			fmt.Println("Error writing to connection:", err)
-			break
-		}
-	}
+type Message struct {
+    Content string `json:"content"`
 }
 
 func main() {
-	cmd := exec.Command("./neuraserver")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		fmt.Println("Error running NeuraServer:", err)
-	}
+    r := mux.NewRouter()
+    r.HandleFunc("/", homeHandler)
+    r.HandleFunc("/message", messageHandler).Methods("POST")
+    log.Fatal(http.ListenAndServe(":8080", r))
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+    w.Write([]byte("Welcome to the API Gateway"))
+}
+
+func messageHandler(w http.ResponseWriter, r *http.Request) {
+    var msg Message
+    err := json.NewDecoder(r.Body).Decode(&msg)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+    w.Write([]byte("Message received: " + msg.Content))
 }
 
 
