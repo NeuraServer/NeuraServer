@@ -1,25 +1,49 @@
+package main
 package server
 
 import (
     "net/http"
     "net/http/httputil"
     "net/url"
+    "sync/atomic"
+    "github.com/gorilla/mux"
+    "log"
 )
 
-type LoadBalancer struct {
-    targets []*httputil.ReverseProxy
+type ServerPool struct {
+    servers []*httputil.ReverseProxy
+    current uint64
 }
 
-func NewLoadBalancer(targets []string) *LoadBalancer {
-    proxies := make([]*httputil.ReverseProxy, len(targets))
-    for i, target := range targets {
-        url, _ := url.Parse(target)
-        proxies[i] = httputil.NewSingleHostReverseProxy(url)
+func (sp *ServerPool) getNextServer() *httputil.ReverseProxy {
+    server := sp.servers[atomic.AddUint64(&sp.current, 1)%uint64(len(sp.servers))]
+    return server
+}
+
+func (sp *ServerPool) loadBalance(w http.ResponseWriter, r *http.Request) {
+    server := sp.getNextServer()
+    server.ServeHTTP(w, r)
+}
+
+func newServerPool(urls []string) *ServerPool {
+    servers := make([]*httputil.ReverseProxy, len(urls))
+    for i, u := range urls {
+        url, _ := url.Parse(u)
+        servers[i] = httputil.NewSingleHostReverseProxy(url)
     }
-    return &LoadBalancer{targets: proxies}
+    return &ServerPool{servers: servers}
 }
 
-func (lb *LoadBalancer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    target := lb.targets[len(r.URL.Path)%len(lb.targets)]
-    target.ServeHTTP(w, r)
+func main() {
+    serverURLs := []string{
+        "http://localhost:8081",
+        "http://localhost:8082",
+    }
+
+    serverPool := newServerPool(serverURLs)
+
+    r := mux.NewRouter()
+    r.HandleFunc("/", serverPool.loadBalance)
+
+    log.Fatal(http.ListenAndServe(":8080", r))
 }
