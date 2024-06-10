@@ -1,0 +1,13 @@
+[package]
+name = "neuraserver"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+actix-web = "4"
+rdkafka = { version = "0.27", features = ["produce", "consume", "rdkafka"] }
+zookeeper = "0.6"
+futures = "0.3"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
