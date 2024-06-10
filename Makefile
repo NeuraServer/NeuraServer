@@ -1,7 +1,3 @@
-# ----------------------------------
-# --- NeuraServer Copyright 2024 ---
-# ----------------------------------
-
 RUST_SRC = src/server_ops/*.rs
 GO_SRC = src/server/*.go
 CPP_SRC = src/server/monitor.cpp
