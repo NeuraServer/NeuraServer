@@ -1,16 +1,22 @@
 use std::env;
+use serde::Deserialize;
+use config::{Config, File, Environment, ConfigError};
 
-pub struct Config {
+#[derive(Debug, Deserialize)]
+pub struct AppConfig {
     pub host: String,
     pub port: String,
+    pub max_connections: usize,
+    pub timeout: u64,
+    pub log_level: String,
 }
 
-impl Config {
-    pub fn new() -> Self {
-        dotenv::dotenv().ok();
-        let host = env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
-        let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
-
-        Config { host, port }
+impl AppConfig {
+    pub fn new() -> Result<Self, ConfigError> {
+        let mut s = Config::new();
+        s.merge(File::with_name("config/default"))?;
+        s.merge(Environment::with_prefix("APP"))?;
+        s.try_into()
     }
 }
+
