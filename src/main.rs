@@ -1,7 +1,3 @@
-// ----------------------------------
-// --- NeuraServer Copyright 2024 ---
-// ----------------------------------
-
 use actix_web::{web, App, HttpServer, HttpResponse, Responder};
 use std::sync::{Arc, Mutex};
 use std::env;
