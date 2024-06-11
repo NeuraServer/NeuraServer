@@ -39,3 +39,9 @@ Check status:
 curl http://localhost:3000/status
 ```
 Now, everything should be set up!
+## Interacting with NeuraServer
+You can use Axios to interact with it, heres how to download it:
+```bash
+npm install axios
+```
+Now, there will be a script in src/ called shipping.js, there, you can fully interact with the NeuraServer API and servers.
