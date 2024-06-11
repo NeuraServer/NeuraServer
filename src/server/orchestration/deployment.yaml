@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuraserver-deployment
+  labels:
+    app: neuraserver
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: neuraserver
+  template:
+    metadata:
+      labels:
+        app: neuraserver
+    spec:
+      containers:
+      - name: neuraserver
+        image: neuraserver:latest
+        ports:
+        - containerPort: 5500
+        env:
+        - name: RUST_LOG
+          value: "info"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/neuraserver
+      volumes:
+      - name: config-volume
+        configMap:
+          name: neuraserver-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: neuraserver-config
+data:
+  config.yaml: |
+    server:
+      address: "127.0.0.1:5500"
