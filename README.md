@@ -8,8 +8,26 @@ NeuraServer is an advanced TCP server that demonstrates the integration of Go fo
 
 NeuraServer is designed to handle high-performance network operations with the robustness of Rust, the efficiency of Go, and the low-level capabilities of C++ for critical assembly operations.
 
+## Features
+
+- High-performance network operations
+- Robustness with Rust
+- Efficiency with Go
+- Low-level operations with C++
+- Big Data Processing with Apache Hadoop
+- Data Streaming with Apache Kafka, Apache Pulsar, and Apache Zookeeper
+- Data Warehousing with Amazon Redshift, Google BigQuery, and Snowflake
+- Data Lakes with Apache Hadoop and Amazon S3
+- Machine Learning and AI with TensorFlow and PyTorch
+- Graph Databases with Neo4j and Amazon Neptune
+- Data Virtualization with Denodo
+- Data Security and Privacy
+- Blockchain and Distributed Ledger Technology
+- Data Governance and Metadata Management
+- Kubernetes orchestration for deployment, service discovery, and autoscaling
+
 ## Checks
-![Static Badge](https://img.shields.io/badge/server-_127.0.0.1%3A5500-red?logo=github) ![Static Badge](https://img.shields.io/badge/build-_passing-green?logo=github) ![Static Badge](https://img.shields.io/badge/docker-_present-blue?logo=github) [![GitHub stars](https://img.shields.io/github/stars/Neuraserver/Neuraserver.svg?style=flat-square)](https://github.com/Neuraserver/Neuraserver/stargazers)
+![Static Badge](https://img.shields.io/badge/server-_127.0.0.1%3A5500-red?logo=github) ![Static Badge](https://img.shields.io/badge/build-_passing-green?logo=github) ![Static Badge](https://img.shields.io/badge/docker-_present-blue?logo=github)
 
 ## Installation
 
@@ -21,7 +39,8 @@ NeuraServer is designed to handle high-performance network operations with the r
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 - [GCC/MINGW](https://sourceforge.net/projects/mingw/)
-- [Node.js and npm](https://nodejs.org/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- [Kubernetes cluster](https://kubernetes.io/docs/setup/)
 
 ### Steps
 
@@ -44,7 +63,6 @@ NeuraServer is designed to handle high-performance network operations with the r
     go build -o handler src/server/handler.go
     go build -o logger src/server/logger.go
     g++ src/serverasm/mod.cpp -o src/serverasm/mod.exe
-    node src/web/shipping.js
     ```
 
 ## Usage
@@ -72,6 +90,28 @@ The Docker configuration files are located in the `.docker` directory.
     ```
 
 The server will be accessible on `127.0.0.1:8080`. You can connect to it using a TCP client.
+
+### Running on Kubernetes
+
+The Kubernetes configuration files are located in the `orchestration` directory.
+
+1. Deploy the application:
+
+    ```sh
+    kubectl apply -f orchestration/deployment.yaml
+    kubectl apply -f orchestration/service.yaml
+    kubectl apply -f orchestration/ingress.yaml
+    kubectl apply -f orchestration/autoscaler.yaml
+    ```
+
+2. Verify the deployment:
+
+    ```sh
+    kubectl get pods
+    kubectl get svc
+    kubectl get ing
+    kubectl get hpa
+    ```
 
 ## Development
 
@@ -106,30 +146,3 @@ To ensure code quality and consistency, use the following commands during develo
     ```sh
     make lint
     ```
-
-## Features
-
-### Data Processing
-- **Big Data Processing**: Utilizing Apache Hadoop for distributed processing of large datasets.
-- **Data Streaming**: Integrating Apache Kafka and Apache Pulsar for real-time data streaming.
-- **Data Warehousing**: Implementing Amazon Redshift and Google BigQuery for scalable data warehousing.
-- **Data Lakes**: Setting up data lakes using Apache Hadoop or Amazon S3.
-- **Machine Learning and AI**: Integrating TensorFlow and PyTorch for machine learning capabilities.
-- **Graph Databases**: Implementing Neo4j and Amazon Neptune for graph database functionalities.
-- **Data Virtualization**: Deploying Denodo for data virtualization solutions.
-- **Data Security and Privacy**: Enhancing data security using encryption and tokenization techniques.
-- **Blockchain**: Exploring blockchain technology for secure data storage and transactions.
-- **Data Governance**: Establishing robust data governance practices.
-
-### Web Integration
-- **NeuraServer Azurite**: Connecting to the web using JavaScript and Node.js.
-- **Shipping Module**: Interacting with NeuraServer through a `shipping.js` file.
-
-### Advanced Functionality
-- **Scalability**: Supporting infinite scalability with advanced Rust and Go implementations.
-- **Customizability**: Providing extensive configuration options for server setup and management.
-- **Real-time Updates**: Implementing Apache Flink for dynamic and live updating of data.
-- **Hardware Communication**: Using various Apache products for multi-server connecting and hardware communication.
-- **Streaming with Zookeeper**: Adding Apache Zookeeper for managing distributed data streaming.
-
-NeuraServer is continuously evolving to include more features and improvements, making it a comprehensive solution for high-performance network operations.
