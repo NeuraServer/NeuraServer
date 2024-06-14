@@ -1,0 +1,119 @@
+server:
+  host: "127.0.0.1"
+  port: 5500
+  max_connections: 1000
+  timeout: 30
+
+database:
+  type: "postgres"
+  host: "127.0.0.1"
+  port: 5432
+  username: "dbuser"
+  password: "dbpassword"
+  database_name: "dbname"
+
+security:
+  enable_https: true
+  ssl_cert_file: "/path/to/cert.pem"
+  ssl_key_file: "/path/to/key.pem"
+  allowed_origins:
+    - "http://localhost:3000"
+    - "https://example.com"
+  allowed_methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+
+logging:
+  level: "info"
+  file: "/var/log/neuraserver.log"
+  max_size: 100 # MB
+  max_backups: 7
+  max_age: 30 # days
+
+api:
+  version: "v1"
+  base_path: "/api/v1"
+  endpoints:
+    - path: "/send_get_request"
+      method: "GET"
+      description: "Send a GET request"
+    - path: "/send_post_request"
+      method: "POST"
+      description: "Send a POST request"
+    - path: "/receive_get_request"
+      method: "GET"
+      description: "Receive a GET request"
+    - path: "/receive_post_request"
+      method: "POST"
+      description: "Receive a POST request"
+
+middleware:
+  enabled:
+    - "authentication"
+    - "logging"
+    - "compression"
+
+authentication:
+  jwt_secret: "your_jwt_secret"
+  token_expiration: 3600 # seconds
+
+compression:
+  level: 6
+
+features:
+  big_data_processing:
+    enabled: true
+    tool: "apache_hadoop"
+  data_streaming:
+    enabled: true
+    tools:
+      - "apache_kafka"
+      - "apache_pulsar"
+      - "apache_zookeeper"
+  machine_learning:
+    enabled: true
+    frameworks:
+      - "tensorflow"
+      - "pytorch"
+  graph_databases:
+    enabled: true
+    tools:
+      - "neo4j"
+      - "amazon_neptune"
+  data_security:
+    enabled: true
+  blockchain:
+    enabled: true
+    tools:
+      - "hyperledger_fabric"
+      - "ethereum"
+
+kubernetes:
+  deployment:
+    replicas: 3
+    image: "neuraserver:latest"
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+
+proxy:
+  enabled: true
+  host: "proxy.neuraserver.com"
+  port: 8080
+  credentials:
+    username: "proxyuser"
+    password: "proxypassword"
+
+pipelines:
+  data_chunk_size: 1024 # KB
+  fault_tolerance: true
+  retry_attempts: 3
+  tools:
+    - "apache_kafka"
+    - "apache_hadoop"
