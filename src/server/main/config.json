@@ -1,0 +1,4 @@
+{
+    "server_address": "127.0.0.1:5500",
+    "database_url": "postgres://user:password@localhost/dbname"
+}
