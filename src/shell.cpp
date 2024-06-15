@@ -1,105 +1,141 @@
 #include <iostream>
-#include <string>
-#include <cstdlib>
-#include <cstdio>
-#include <memory>
+#include <fstream>
+#include <sstream>
 #include <stdexcept>
-#include <array>
+#include <string>
+#include <vector>
+#include <unistd.h>
+#include <arpa/inet.h>
 #include <thread>
 #include <chrono>
+#include <atomic>
 
-void print_help() {
-    std::cout << "NeuraShell Commands:\n";
-    std::cout << "help          - Show this help message\n";
-    std::cout << "start_server  - Start the server\n";
-    std::cout << "stop_server   - Stop the server\n";
-    std::cout << "status        - Check if the server is running\n";
-    std::cout << "exit          - Exit NeuraShell\n";
-}
+class ServerConnection {
+public:
+    ServerConnection(const std::string& ip, int port) : ip(ip), port(port), sock(-1) {
+        connectToServer();
+    }
 
-bool is_server_running() {
-    std::array<char, 128> buffer;
-    std::string result;
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen("pgrep neuraserver", "r"), pclose);
-    if (!pipe) {
-        throw std::runtime_error("popen() failed!");
-    }
-    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        result += buffer.data();
-    }
-    return !result.empty();
-}
+    void connectToServer() {
+        if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+            throw std::runtime_error("Socket creation error");
+        }
 
-void start_server() {
-    if (is_server_running()) {
-        std::cout << "Server is already running.\n";
-        return;
-    }
-    std::cout << "Starting server...\n";
-    int result = std::system("cargo run --manifest-path main.rs &");
-    if (result != 0) {
-        std::cerr << "Failed to start the server.\n";
-    } else {
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        if (is_server_running()) {
-            std::cout << "Server started successfully.\n";
-        } else {
-            std::cerr << "Failed to start the server.\n";
+        server_address.sin_family = AF_INET;
+        server_address.sin_port = htons(port);
+
+        if (inet_pton(AF_INET, ip.c_str(), &server_address.sin_addr) <= 0) {
+            throw std::runtime_error("Invalid address or address not supported");
+        }
+
+        if (connect(sock, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
+            throw std::runtime_error("Connection failed");
         }
     }
+
+    void sendData(const std::string& data) {
+        send(sock, data.c_str(), data.length(), 0);
+    }
+
+    std::string receiveData() {
+        char buffer[1024] = {0};
+        read(sock, buffer, 1024);
+        return std::string(buffer);
+    }
+
+    ~ServerConnection() {
+        close(sock);
+    }
+
+private:
+    std::string ip;
+    int port;
+    int sock;
+    struct sockaddr_in server_address;
+};
+
+std::vector<std::string> split(const std::string& str, char delimiter) {
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(str);
+    while (std::getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    return tokens;
 }
 
-void stop_server() {
-    if (!is_server_running()) {
-        std::cout << "Server is not running.\n";
-        return;
-    }
-    std::cout << "Stopping server...\n";
-    int result = std::system("pkill neuraserver");
-    if (result != 0) {
-        std::cerr << "Failed to stop the server or server not running.\n";
-    } else {
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        if (!is_server_running()) {
-            std::cout << "Server stopped successfully.\n";
-        } else {
-            std::cerr << "Failed to stop the server.\n";
-        }
+void executeCommand(const std::string& command) {
+    std::system(command.c_str());
+}
+
+void liveMonitor(ServerConnection& server, std::atomic<bool>& running) {
+    while (running.load()) {
+        server.sendData("status");
+        std::string response = server.receiveData();
+        std::cout << "Server Status: " << response << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 }
 
-void check_status() {
-    if (is_server_running()) {
-        std::cout << "Server is running.\n";
-    } else {
-        std::cout << "Server is not running.\n";
-    }
+void startLiveMonitoring(ServerConnection& server, std::atomic<bool>& running) {
+    std::thread monitoringThread(liveMonitor, std::ref(server), std::ref(running));
+    monitoringThread.detach();
+}
+
+void checkServerHealth(ServerConnection& server) {
+    server.sendData("health_check");
+    std::string response = server.receiveData();
+    std::cout << "Server Health: " << response << std::endl;
 }
 
 int main() {
-    std::string command;
+    std::ifstream config_file("config.txt");
+    if (!config_file.is_open()) {
+        std::cerr << "Could not open config file." << std::endl;
+        return 1;
+    }
 
-    std::cout << "Welcome to NeuraServer Shell! Type 'help' to see available commands.\n";
-
-    while (true) {
-        std::cout << "nsshell/:> ";
-        std::getline(std::cin, command);
-
-        if (command == "help") {
-            print_help();
-        } else if (command == "start_server") {
-            start_server();
-        } else if (command == "stop_server") {
-            stop_server();
-        } else if (command == "status") {
-            check_status();
-        } else if (command == "exit") {
-            std::cout << "Exiting NeuraShell...\n";
-            break;
-        } else {
-            std::cout << "Unknown command: " << command << "\n";
-            std::cout << "Type 'help' to see available commands.\n";
+    std::string line;
+    std::string ip;
+    int port;
+    while (std::getline(config_file, line)) {
+        auto tokens = split(line, '=');
+        if (tokens.size() != 2) {
+            continue;
         }
+        if (tokens[0] == "IP") {
+            ip = tokens[1];
+        } else if (tokens[0] == "PORT") {
+            port = std::stoi(tokens[1]);
+        }
+    }
+
+    try {
+        ServerConnection server(ip, port);
+        std::atomic<bool> running(true);
+
+        startLiveMonitoring(server, running);
+
+        std::string command;
+        while (true) {
+            std::cout << "Enter command: ";
+            std::getline(std::cin, command);
+            if (command == "exit") {
+                running.store(false);
+                break;
+            } else if (command == "health") {
+                checkServerHealth(server);
+            } else {
+                server.sendData(command);
+                std::string response = server.receiveData();
+                std::cout << "Response: " << response << std::endl;
+
+                executeCommand(command);
+            }
+        }
+
+    } catch (const std::exception& ex) {
+        std::cerr << "Error: " << ex.what() << std::endl;
     }
 
     return 0;
